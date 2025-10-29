@@ -1,0 +1,91 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+// Recursive matrix multiplication (simplified for small n)
+void multiplyRecursive(int n, int A[n][n], int B[n][n], int C[n][n]) {
+    if (n == 1) {
+        C[0][0] = A[0][0] * B[0][0];
+        return;
+    }
+
+    int mid = n / 2;
+    int a11[mid][mid], a12[mid][mid], a21[mid][mid], a22[mid][mid];
+    int b11[mid][mid], b12[mid][mid], b21[mid][mid], b22[mid][mid];
+    int c11[mid][mid], c12[mid][mid], c21[mid][mid], c22[mid][mid];
+    int temp1[mid][mid], temp2[mid][mid];
+
+    // Divide the matrices into 4 submatrices
+    for (int i = 0; i < mid; i++)
+        for (int j = 0; j < mid; j++) {
+            a11[i][j] = A[i][j];
+            a12[i][j] = A[i][j + mid];
+            a21[i][j] = A[i + mid][j];
+            a22[i][j] = A[i + mid][j + mid];
+
+            b11[i][j] = B[i][j];
+            b12[i][j] = B[i][j + mid];
+            b21[i][j] = B[i + mid][j];
+            b22[i][j] = B[i + mid][j + mid];
+        }
+
+    // Recursive calls (naive divide-and-conquer method)
+    multiplyRecursive(mid, a11, b11, temp1);
+    multiplyRecursive(mid, a12, b21, temp2);
+    for (int i = 0; i < mid; i++)
+        for (int j = 0; j < mid; j++)
+            c11[i][j] = temp1[i][j] + temp2[i][j];
+
+    multiplyRecursive(mid, a11, b12, temp1);
+    multiplyRecursive(mid, a12, b22, temp2);
+    for (int i = 0; i < mid; i++)
+        for (int j = 0; j < mid; j++)
+            c12[i][j] = temp1[i][j] + temp2[i][j];
+
+    multiplyRecursive(mid, a21, b11, temp1);
+    multiplyRecursive(mid, a22, b21, temp2);
+    for (int i = 0; i < mid; i++)
+        for (int j = 0; j < mid; j++)
+            c21[i][j] = temp1[i][j] + temp2[i][j];
+
+    multiplyRecursive(mid, a21, b12, temp1);
+    multiplyRecursive(mid, a22, b22, temp2);
+    for (int i = 0; i < mid; i++)
+        for (int j = 0; j < mid; j++)
+            c22[i][j] = temp1[i][j] + temp2[i][j];
+
+    // Combine results into C
+    for (int i = 0; i < mid; i++)
+        for (int j = 0; j < mid; j++) {
+            C[i][j] = c11[i][j];
+            C[i][j + mid] = c12[i][j];
+            C[i + mid][j] = c21[i][j];
+            C[i + mid][j + mid] = c22[i][j];
+        }
+}
+
+int main() {
+    int n;
+    clock_t start, end;
+    double time_taken;
+
+    printf("Enter matrix size (must be power of 2): ");
+    scanf("%d", &n);
+
+    int A[n][n], B[n][n], C[n][n];
+
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++) {
+            A[i][j] = rand() % 10;
+            B[i][j] = rand() % 10;
+        }
+
+    start = clock();
+    multiplyRecursive(n, A, B, C);
+    end = clock();
+
+    time_taken = ((double)(end - start)) / CLOCKS_PER_SEC;
+    printf("Time taken: %.6f seconds\n", time_taken);
+
+    return 0;
+}
