@@ -1,0 +1,92 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+// Function to merge two halves
+void merge(int arr[], int left, int mid, int right) {
+    int i, j, k;
+    int n1 = mid - left + 1;
+    int n2 = right - mid;
+
+    int L[n1], R[n2];
+
+    for (i = 0; i < n1; i++)
+        L[i] = arr[left + i];
+    for (j = 0; j < n2; j++)
+        R[j] = arr[mid + 1 + j];
+
+    i = 0;
+    j = 0;
+    k = left;
+
+    while (i < n1 && j < n2) {
+        if (L[i] <= R[j])
+            arr[k++] = L[i++];
+        else
+            arr[k++] = R[j++];
+    }
+
+    while (i < n1)
+        arr[k++] = L[i++];
+
+    while (j < n2)
+        arr[k++] = R[j++];
+}
+
+// Merge Sort function
+void mergeSort(int arr[], int left, int right) {
+    if (left < right) {
+        int mid = (left + right) / 2;
+        mergeSort(arr, left, mid);
+        mergeSort(arr, mid + 1, right);
+        merge(arr, left, mid, right);
+    }
+}
+
+// Main function
+int main() {
+    int n;
+    clock_t start, end;
+    double time_taken;
+
+    FILE *fp = fopen("merge_sort_time.csv", "w");
+    if (fp == NULL) {
+        printf("Error creating output file!\n");
+        return 1;
+    }
+
+    fprintf(fp, "n,Time(seconds)\n");
+
+    printf("Merge Sort Time Analysis\n");
+
+    // Run for various n values
+    for (n = 1000; n <= 100000; n += 5000) {
+        int *arr = (int *)malloc(n * sizeof(int));
+        if (arr == NULL) {
+            printf("Memory allocation failed!\n");
+            return 1;
+        }
+
+        // Generate random numbers
+        for (int i = 0; i < n; i++)
+            arr[i] = rand() % 100000;
+
+        // Measure sorting time
+        start = clock();
+        mergeSort(arr, 0, n - 1);
+        end = clock();
+
+        time_taken = ((double)(end - start)) / CLOCKS_PER_SEC;
+
+        fprintf(fp, "%d,%.10f\n", n, time_taken);
+
+        free(arr);
+    }
+
+    fclose(fp);
+
+    printf("Data saved to 'merge_sort_time.csv'.\n");
+    printf("Use Excel or Python to plot graph of Time vs n.\n");
+
+    return 0;
+}
