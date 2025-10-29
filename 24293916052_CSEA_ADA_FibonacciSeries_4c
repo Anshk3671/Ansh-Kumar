@@ -1,0 +1,23 @@
+#include <stdio.h>
+
+int memo[100];
+
+int fib_topdown(int n) {
+    if (n <= 1)
+        return n;
+    if (memo[n] != -1)
+        return memo[n];
+    memo[n] = fib_topdown(n - 1) + fib_topdown(n - 2);
+    return memo[n];
+}
+
+int main() {
+    int n = 10;
+    for (int i = 0; i <= n; i++)
+        memo[i] = -1;
+
+    for (int i = 0; i < n; i++)
+        printf("%d ", fib_topdown(i));
+
+    return 0;
+}
