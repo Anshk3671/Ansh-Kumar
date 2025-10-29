@@ -1,0 +1,58 @@
+#include <stdio.h>
+
+void fractionalKnapsack(int n, float weight[], float value[], float capacity) {
+    float ratio[20], x[20], totalValue = 0, temp;
+    int i, j;
+
+    for (i = 0; i < n; i++)
+        ratio[i] = value[i] / weight[i];
+
+    // Sorting in descending order of ratio
+    for (i = 0; i < n; i++) {
+        for (j = i + 1; j < n; j++) {
+            if (ratio[i] < ratio[j]) {
+                temp = ratio[j];
+                ratio[j] = ratio[i];
+                ratio[i] = temp;
+
+                temp = weight[j];
+                weight[j] = weight[i];
+                weight[i] = temp;
+
+                temp = value[j];
+                value[j] = value[i];
+                value[i] = temp;
+            }
+        }
+    }
+
+    for (i = 0; i < n; i++)
+        x[i] = 0.0;
+
+    float remaining = capacity;
+    for (i = 0; i < n; i++) {
+        if (weight[i] > remaining)
+            break;
+        else {
+            x[i] = 1.0;
+            totalValue += value[i];
+            remaining -= weight[i];
+        }
+    }
+
+    if (i < n)
+        x[i] = remaining / weight[i];
+    totalValue += x[i] * value[i];
+
+    printf("\nThe maximum value in knapsack = %.2f\n", totalValue);
+}
+
+int main() {
+    int n = 3;
+    float weight[20] = {10, 20, 30};
+    float value[20] = {60, 100, 120};
+    float capacity = 50;
+
+    fractionalKnapsack(n, weight, value, capacity);
+    return 0;
+}
